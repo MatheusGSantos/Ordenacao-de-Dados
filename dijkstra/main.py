@@ -33,18 +33,18 @@ def min_heapify(i):
     global m_heap
     l = left(i)
     r = right(i)
-    maior = -1  # assumindo que a heap só contenha números positivos
+    menor = -1  # assumindo que a heap só contenha números positivos
     if (l <= m_heap.heap_size - 1) and (m_heap.heap_array[l] < m_heap.heap_array[i]):
-        maior = l
+        menor = l
     else:
-        maior = i
-    if (r <= m_heap.heap_size - 1) and m_heap.heap_array[r] < m_heap.heap_array[maior]:
-        maior = r
+        menor = i
+    if (r <= m_heap.heap_size - 1) and m_heap.heap_array[r] < m_heap.heap_array[menor]:
+        menor = r
     if maior != i:
         aux = m_heap.heap_array[i]
-        m_heap.heap_array[i] = m_heap.heap_array[maior]
-        m_heap.heap_array[maior] = aux
-        min_heapify(maior)
+        m_heap.heap_array[i] = m_heap.heap_array[menor]
+        m_heap.heap_array[menor] = aux
+        min_heapify(menor)
 
 
 # função que aplica max_heapify em toda a heap
@@ -54,6 +54,25 @@ def build_min_heap():
     i = int(m_heap.heap_size / 2)
     for i in range(i-1,-1,-1):
         min_heapify(i)
+
+def heap_minimum():
+    global m_heap
+    return m_heap.heap_array
+
+
+def heap_extract_min():
+    if(m_heap.heap_size < 1):
+        return "heap underflow"
+    minimo = m_heap.heap_array[0]
+    m_heap.heap_array[0] = m_heap.heap_array[m_heap.heap_size-1]
+    m_heap.heap_size -= 1
+    min_heapify(0)
+    return minimo
+
+
+def heap_increase_key(i, key):
+    global m_heap
+    if(key < )
 
 
 # heap sort
