@@ -1,3 +1,5 @@
+import sys
+
 # criando a classe Heap
 class Heap:
     def __init__(self, heap_ar):
@@ -6,10 +8,18 @@ class Heap:
 
 
 # instanciando a classe Heap (casos de teste)
-with open("couting.txt", 'r') as input_f:
+"""with open("couting.txt", 'r') as input_f:
     m_heap = input_f.read().split('\n')[1:]
     m_heap = list(map(int,m_heap))
-    m_heap = Heap(m_heap)
+    m_heap = Heap(m_heap)"""
+
+
+with open("dij10.txt", 'r') as input_f:
+    matrix = input_f.readline()
+    matrix = input_f.read()
+    # matrix = input_f.read().split('\n')[1:]
+    # m_heap = list(map(int,m_heap))
+    # m_heap = Heap(m_heap)
 
 
 # função que retorna o indice do filho da esquerda
@@ -27,6 +37,9 @@ def right(i):
     else:
         return int(2*i + 1)
 
+def parent(i):
+    return int((i-1)/2)
+
 
 # função que realiza a operação de troca do max heap numa "subarvore" da heap
 def min_heapify(i):
@@ -40,7 +53,7 @@ def min_heapify(i):
         menor = i
     if (r <= m_heap.heap_size - 1) and m_heap.heap_array[r] < m_heap.heap_array[menor]:
         menor = r
-    if maior != i:
+    if menor != i:
         aux = m_heap.heap_array[i]
         m_heap.heap_array[i] = m_heap.heap_array[menor]
         m_heap.heap_array[menor] = aux
@@ -70,24 +83,24 @@ def heap_extract_min():
     return minimo
 
 
-def heap_increase_key(i, key):
+def heap_decrease_key(i, key): #key: valor inteiro a ser colocado
     global m_heap
-    if(key < )
+    if(key > m_heap.heap_array[i]):
+        return "nada a ser feito"
+    m_heap.heap_array[i] = key
+    while (i>1) and (m_heap.heap_array[parent(i)] < m_heap.heap_array[i]):
+        aux = m_heap.heap_array[i]
+        m_heap.heap_array[i] = m_heap.heap_array[parent(i)]
+        m_heap.heap_array[parent(i)] = aux
+        i = parent(i)
 
 
-# heap sort
-"""def heap_sort():
+def min_heap_insert(key):
     global m_heap
-    build_min_heap()
-    i = m_heap.heap_size - 1
-    while i > 0:
-        aux = m_heap.heap_array[0]
-        m_heap.heap_array[0] = m_heap.heap_array[i]
-        m_heap.heap_array[i] = aux
-        m_heap.heap_size -= 1
-        min_heapify(0)
-        i -= 1
-"""
+    m_heap.heap_array += 1
+    m_heap.heap_array.append(sys.maxsize)
+    heap_decrease_key(m_heap.heap_size,key)
+
 
 # main
 print("Array antes:")
@@ -95,3 +108,23 @@ print(m_heap.heap_array)
 build_min_heap()
 print("\nArray ordenado:")
 print(m_heap.heap_array)
+
+
+#tentativa de fazer alguma coisa
+"""with open("dij10.txt", 'r') as input_f:
+    matrix = input_f.readline()
+    matrix = input_f.read().split('\n')[:]
+    matrix = [x.split(" ") for x in matrix]
+    for l in matrix:
+        if l[0] == '':
+            del matrix[matrix.index(l)]
+            continue
+        for i in l:
+            if(i == ''):
+                del matrix[matrix.index(l)][matrix[matrix.index(l)].index(i)]
+
+    for i in matrix:
+        for j in i:
+            j = list(map(int,j))
+    
+    print(matrix)"""
