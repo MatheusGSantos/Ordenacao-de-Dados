@@ -37,11 +37,13 @@ with open("dij10.txt", 'r') as input_f:
             if(i == ''):
                 del matrix[matrix.index(l)][matrix[matrix.index(l)].index(i)]
 
+
     # transformar para inteiro
     for i in range(len(matrix)):
         for j in range(len(matrix[i])):
             matrix[i][j] = int(matrix[i][j])
-    
+
+
     #matrix.append([])
     """
     # adicionar 0 e rebater o triangulo
@@ -59,38 +61,28 @@ with open("dij10.txt", 'r') as input_f:
     for p in matrix:
         print(p)
     # agora temos uma matriz de vértices
-    # criando o grafo e inserindo vertices e arestas
-    
+
+    ## criando o grafo e inserindo vertices e arestas
+    # adicionando vértices
     grafo = Graph()
     for z in range(len(matrix)+1):
         grafo.add_vertex(z)
-    #print(grafo.adj_list)
+
+    # adicionando arestas
+    aux = 0
     for x in range(len(matrix)): # de 0 a 8
         for y in range(x+1, len(matrix)+1): # de 1 a 9, de 2 a 9, ...
-            grafo.add_edge(x,y,375)
+            grafo.add_edge(x,y,matrix[x][aux])
+            aux += 1
+        aux = 0
     
-    #for each_k in grafo.adj_list:
-    #    print(each_k)
-    #    print(grafo.adj_list[each_k])
-    """
-    adj = {}
-    for v in range(len(matrix)):
-        adj[v] = copy.copy(matrix[v])
-        del adj[v][adj[v].index(0)]
-        """
-""""    
-    for elem in adj:
-        print(elem, end=': ')
-        print(adj[elem])
-        print()
-    
-    for elem in matrix:
-        print(elem)
-
-
-    for x in matrix:
-        print(x)
 """
+    for each_k in grafo.adj_list:
+        print(each_k)
+        print(grafo.adj_list[each_k])
+"""    
+
+
 
 # função que retorna o indice do filho da esquerda
 def left(i):
