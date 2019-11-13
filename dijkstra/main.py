@@ -1,4 +1,5 @@
 import sys
+import copy
 
 # criando a classe Heap
 class Heap:
@@ -7,20 +8,56 @@ class Heap:
         self.heap_size = len(heap_ar)
 
 
-# instanciando a classe Heap (casos de teste)
-"""with open("couting.txt", 'r') as input_f:
-    m_heap = input_f.read().split('\n')[1:]
-    m_heap = list(map(int,m_heap))
-    m_heap = Heap(m_heap)"""
-
-
 with open("dij10.txt", 'r') as input_f:
     matrix = input_f.readline()
-    matrix = input_f.read()
-    # matrix = input_f.read().split('\n')[1:]
-    # m_heap = list(map(int,m_heap))
-    # m_heap = Heap(m_heap)
+    matrix = input_f.read().split('\n')[:]
+    matrix = [x.split(" ") for x in matrix]
+    for l in matrix:
+        if l[0] == '':
+            del matrix[matrix.index(l)]
+            continue
+        for i in l:
+            if(i == ''):
+                del matrix[matrix.index(l)][matrix[matrix.index(l)].index(i)]
 
+    # transformar para inteiro
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            matrix[i][j] = int(matrix[i][j])
+    
+    matrix.append([])
+    
+    # adicionar 0 e rebater o triangulo
+    auxiliar = 0
+    i = 0
+    for x in matrix:
+        matrix[i].insert(0,0)
+
+        # preencher o triangulo debaixo
+        for c in range(auxiliar):
+            matrix[i].insert(0,matrix[auxiliar-1-c][auxiliar])
+        i += 1
+        auxiliar += 1
+    
+    # agora temos uma matriz de vértices
+    # construindo então uma lista de adjacencias
+    adj = {}
+    for v in range(len(matrix)):
+        adj[v] = copy.copy(matrix[v])
+        del adj[v][adj[v].index(0)]
+""""    
+    for elem in adj:
+        print(elem, end=': ')
+        print(adj[elem])
+        print()
+    
+    for elem in matrix:
+        print(elem)
+
+
+    for x in matrix:
+        print(x)
+"""
 
 # função que retorna o indice do filho da esquerda
 def left(i):
@@ -37,6 +74,8 @@ def right(i):
     else:
         return int(2*i + 1)
 
+
+# função que retorna o pai
 def parent(i):
     return int((i-1)/2)
 
@@ -68,11 +107,14 @@ def build_min_heap():
     for i in range(i-1,-1,-1):
         min_heapify(i)
 
+
+# retorna o valor minimo (raiz)
 def heap_minimum():
     global m_heap
     return m_heap.heap_array
 
 
+# extrai o valor mínimo
 def heap_extract_min():
     if(m_heap.heap_size < 1):
         return "heap underflow"
@@ -83,6 +125,7 @@ def heap_extract_min():
     return minimo
 
 
+# sobe o nó
 def heap_decrease_key(i, key): #key: valor inteiro a ser colocado
     global m_heap
     if(key > m_heap.heap_array[i]):
@@ -95,6 +138,7 @@ def heap_decrease_key(i, key): #key: valor inteiro a ser colocado
         i = parent(i)
 
 
+# insere uma chave
 def min_heap_insert(key):
     global m_heap
     m_heap.heap_array += 1
@@ -102,29 +146,13 @@ def min_heap_insert(key):
     heap_decrease_key(m_heap.heap_size,key)
 
 
+def func():
+    return
+
+
 # main
-print("Array antes:")
+"""print("Array antes:")
 print(m_heap.heap_array)
 build_min_heap()
 print("\nArray ordenado:")
-print(m_heap.heap_array)
-
-
-#tentativa de fazer alguma coisa
-"""with open("dij10.txt", 'r') as input_f:
-    matrix = input_f.readline()
-    matrix = input_f.read().split('\n')[:]
-    matrix = [x.split(" ") for x in matrix]
-    for l in matrix:
-        if l[0] == '':
-            del matrix[matrix.index(l)]
-            continue
-        for i in l:
-            if(i == ''):
-                del matrix[matrix.index(l)][matrix[matrix.index(l)].index(i)]
-
-    for i in matrix:
-        for j in i:
-            j = list(map(int,j))
-    
-    print(matrix)"""
+print(m_heap.heap_array)"""
