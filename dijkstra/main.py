@@ -8,6 +8,23 @@ class Heap:
         self.heap_size = len(heap_ar)
 
 
+# criando a classe Grafo
+class Graph:
+    def __init__(self):
+        self.adj_list = {}
+    
+
+    def add_vertex(self,vertex):
+        if vertex not in self.adj_list:
+            self.adj_list[vertex] = {}
+    
+
+    def add_edge(self, vertex1, vertex2, weight):
+        self.adj_list[vertex1][vertex2] = weight
+        self.adj_list[vertex2][vertex1] = weight
+
+
+
 with open("dij10.txt", 'r') as input_f:
     matrix = input_f.readline()
     matrix = input_f.read().split('\n')[:]
@@ -25,8 +42,8 @@ with open("dij10.txt", 'r') as input_f:
         for j in range(len(matrix[i])):
             matrix[i][j] = int(matrix[i][j])
     
-    matrix.append([])
-    
+    #matrix.append([])
+    """
     # adicionar 0 e rebater o triangulo
     auxiliar = 0
     i = 0
@@ -38,13 +55,29 @@ with open("dij10.txt", 'r') as input_f:
             matrix[i].insert(0,matrix[auxiliar-1-c][auxiliar])
         i += 1
         auxiliar += 1
-    
+    """
+    for p in matrix:
+        print(p)
     # agora temos uma matriz de vértices
-    # construindo então uma lista de adjacencias
+    # criando o grafo e inserindo vertices e arestas
+    
+    grafo = Graph()
+    for z in range(len(matrix)+1):
+        grafo.add_vertex(z)
+    #print(grafo.adj_list)
+    for x in range(len(matrix)): # de 0 a 8
+        for y in range(x+1, len(matrix)+1): # de 1 a 9, de 2 a 9, ...
+            grafo.add_edge(x,y,375)
+    
+    #for each_k in grafo.adj_list:
+    #    print(each_k)
+    #    print(grafo.adj_list[each_k])
+    """
     adj = {}
     for v in range(len(matrix)):
         adj[v] = copy.copy(matrix[v])
         del adj[v][adj[v].index(0)]
+        """
 """"    
     for elem in adj:
         print(elem, end=': ')
