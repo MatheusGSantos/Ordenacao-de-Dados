@@ -18,9 +18,10 @@ class Graph:
 
 
     def dijkstra(self, start, finish):
-        queue = []
+        queue = [] # heap
         distances = {}
         previous = {}
+        
         # initialize
         for vertex in self.adj_list:
             if(vertex == start):
@@ -30,11 +31,23 @@ class Graph:
                 distances[vertex] = sys.maxsize
                 heapq.heappush(queue, [sys.maxsize, vertex])
             previous[vertex] = None
-
+        
         # enquanto tiver elementos na fila
         while queue:
-            pass
+            u = heapq.heappop(queue)    # u[0]: distancia; u[1]: vértice
 
+            for each_vertex in self.adj_list[u[1]]:
+                ## relax
+                """ candidate é a soma da distancia atual do vértice + distancia
+                    do vértice adjacente"""
+                candidate = distances[u[1]] + self.adj_list[u[1]][each_vertex]
+
+                if(candidate < distances[each_vertex]):
+                    # atualizando os valores
+                    distances[each_vertex] = candidate
+                    previous[each_vertex] = u[1]
+                    heapq.heappush(queue, [candidate, each_vertex])
+        print(f"Menor distância entre {start} e {finish}: {distances[finish]}")
 
 
 with open("dij10.txt", 'r') as input_f:
