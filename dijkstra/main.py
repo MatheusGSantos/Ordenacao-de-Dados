@@ -18,9 +18,11 @@ class Graph:
 
 
     def dijkstra(self, start, finish):
-        queue = [] # heap
-        distances = {}
-        previous = {}
+        queue = [] # heap queue
+        distances = {}  # distances
+        previous = {} # previous vertex
+        visited = {} # visited (true or false)
+        path = [] # path stack
         
         # initialize
         for vertex in self.adj_list:
@@ -31,23 +33,34 @@ class Graph:
                 distances[vertex] = sys.maxsize
                 heapq.heappush(queue, [sys.maxsize, vertex])
             previous[vertex] = None
+            visited[vertex] = False
         
         # enquanto tiver elementos na fila
         while queue:
             u = heapq.heappop(queue)    # u[0]: distancia; u[1]: vértice
+            if(visited[u[1]] == False):
+                visited[u[1]] = True
+                for each_vertex in self.adj_list[u[1]]:
+                    ## relax
+                    """ candidate é a soma da distancia atual do vértice + distancia
+                        do vértice adjacente"""
+                    candidate = distances[u[1]] + self.adj_list[u[1]][each_vertex]
 
-            for each_vertex in self.adj_list[u[1]]:
-                ## relax
-                """ candidate é a soma da distancia atual do vértice + distancia
-                    do vértice adjacente"""
-                candidate = distances[u[1]] + self.adj_list[u[1]][each_vertex]
-
-                if(candidate < distances[each_vertex]):
-                    # atualizando os valores
-                    distances[each_vertex] = candidate
-                    previous[each_vertex] = u[1]
-                    heapq.heappush(queue, [candidate, each_vertex])
+                    if(candidate < distances[each_vertex]):
+                        # atualizando os valores
+                        distances[each_vertex] = candidate
+                        previous[each_vertex] = u[1]
+                        heapq.heappush(queue, [candidate, each_vertex])
         print(f"Menor distância entre {start} e {finish}: {distances[finish]}")
+        # printar o menor caminho
+        current_node = finish
+        path.insert(0,finish)
+        while(previous[current_node] != None):
+            path.insert(0,previous[current_node])
+            current_node = previous[current_node]
+        path = list(map(str,path))
+        print("Caminho: ", end='')
+        print(" > ".join(path))
 
 
 with open("dij10.txt", 'r') as input_f:
