@@ -4,18 +4,21 @@
 #include <locale>
 #include <tuple>
 #include <cstdlib>
-#include <windows.h>
+#include <vector>
+#include <string>
 
 using namespace std;
 
 class node{
     public:
         unsigned frequency;
+        wchar_t character;
         node* left;
         node* right;
         
-        node(int f){
+        node(int f, wchar_t c){
             frequency = f;
+            character = c;
             left = NULL;
             right = NULL;
         }
@@ -39,22 +42,24 @@ Compression
 
 node buildHuffmanTree(unsigned bytes[256])
 {
-    // priority queue
-    priority_queue<tuple <unsigned, wchar_t> > pq; // < frequencia, identificador >
+    // priority queue < frequencia, identificador >
+    priority_queue< 
+        tuple <unsigned, wchar_t>, 
+        vector< tuple <unsigned, wchar_t> >, 
+        greater<tuple <unsigned, wchar_t> > 
+        > pq;
 
-    
+    // dando enqueue
     for(int i=0; i < 256; i++)
     {
         if(bytes[i] != 0)
         {
             wchar_t c;
-            //mbtowc(NULL NULL, 0);
-            mbtowc(c,i,1);
-            //wcout << c << endl;
+            pq.push( make_tuple( bytes[i], c) );
         }
     }
     
-    return node(3);
+    //return node();
 }
 
 
@@ -74,12 +79,10 @@ int main() {
         while(wf.get(c))
             bytes[c]+= 1;
         
-        buildHuffmanTree(bytes);
+        //buildHuffmanTree(bytes);
         //node tree = buildHuffmanTree(wf);
     }
     
     //std::ofstream output;
 
-    
-    
 }
