@@ -11,17 +11,17 @@
 #include <locale.h>
 
 using namespace std;
-typedef unsigned char byte;
+//typedef unsigned char byte;
 
 //tree node
 class node{
     public:
         unsigned frequency;
-        byte character;
+        char character;
         node* left;
         node* right;
         
-        node(int f, byte c){
+        node(int f, char c){
             frequency = f;
             character = c;
             left = NULL;
@@ -40,51 +40,59 @@ void write_byte(ofstream file, char c)
 
 
 /* Compression */
-/*
+
 node buildHuffmanTree(unsigned bytes[256])
 {
-    // priority queue < frequencia, identificador >
+    // priority queue < frequencia, identificador > //mudar
     priority_queue< 
-        tuple <unsigned, byte>, 
-        vector< tuple <unsigned, byte> >, 
-        greater<tuple <unsigned, byte> > 
+        tuple <unsigned, char>, 
+        vector< tuple <unsigned, char> >, 
+        greater< tuple <unsigned, char> > 
         > pq;
 
-    // dando enqueue
+    // dando enqueue    //mudar
     for(int i=0; i < 256; i++)
     {
         if(bytes[i] != 0)
         {
-            byte c;
-            pq.push( make_tuple( bytes[i], c) );
+            pq.push( make_tuple( bytes[i], (char) i ) );
         }
     }
+
+    //build tree
+    while (pq.size())   //enquanto a fila não estiver vazia
+    {
+        node z(0,0);    //mudar
+        tuple <unsigned, char> temp = pq.top();
+        pq.pop();
+        cout << get<0>(temp) << " ," << get<1>(temp) << "popped\n";
+    }    
     
     //return node();
 }
-*/
+
 
 
 
 int main() {
     int operation = 0;
-    setlocale(LC_ALL,"");
+    //setlocale(LC_ALL,"");
     if(operation == 0) //compression
     {
-        FILE* input_f = fopen("test.txt", "rb"); // test.txt contains utf-8 text
+        FILE* input_f = fopen("test.bin", "rb");
         //get every byte frequency
-        byte c;
+        //byte c;
         unsigned bytes[256] = {0};
-        int temp;
-        //char c2;
-        /*while(*/fread(&c, sizeof(byte), 1, input_f);//)
-        //{
-            temp = c;
-        //    bytes[temp]+= 1;
-            printf("%d\n", temp);
-        //}
-        FILE* output_f = fopen("test_out.txt", "wb");
-        fwrite(&c, 1, sizeof(c), output_f);
+        char c;
+
+        while( fread(&c, sizeof(char), 1, input_f) == 1)
+        {
+            //printf("character: %c\n", c);
+            bytes[c]+= 1;
+        }
+        fclose(input_f);
+        
+
 /*      
         for(int i =0; i<256; i++)
         {
@@ -94,8 +102,10 @@ int main() {
             }
         }
 */        
-        //buildHuffmanTree(bytes);
+        buildHuffmanTree(bytes);
         //node tree = buildHuffmanTree(wf);
+        FILE* output_f = fopen("test_out.txt", "wb");
+        fwrite(&c, 1, sizeof(c), output_f);
     }
     
     //std::ofstream output;
