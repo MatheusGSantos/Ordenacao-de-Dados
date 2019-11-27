@@ -21,16 +21,16 @@ class node{
         node* left;
         node* right;
         
-        node(int f, char c){
-            frequency = f;
-            character = c;
-            left = NULL;
-            right = NULL;
-        }
-
+        node(){}
         ~node(){}
 };
 
+class compare{
+    public:
+        bool operator()(const node* n1, const node* n2) const{
+            return n1->frequency > n2->frequency;
+        }
+};
 
 //writing a character into a file
 void write_byte(ofstream file, char c)
@@ -41,34 +41,38 @@ void write_byte(ofstream file, char c)
 
 /* Compression */
 
-node buildHuffmanTree(unsigned bytes[256])
+node* buildHuffmanTree(unsigned bytes[256])
 {
     // priority queue < frequencia, identificador > //mudar
-    priority_queue< 
-        tuple <unsigned, char>, 
-        vector< tuple <unsigned, char> >, 
-        greater< tuple <unsigned, char> > 
-        > pq;
+    priority_queue<node*, vector< node* >, compare> pq;
 
-    // dando enqueue    //mudar
+    // dando enqueue
     for(int i=0; i < 256; i++)
     {
         if(bytes[i] != 0)
         {
-            pq.push( make_tuple( bytes[i], (char) i ) );
+            node* n = (node*) malloc(sizeof(node));
+            n->frequency = bytes[i];
+            n->character = i;
+            n->left = NULL;
+            n->right = NULL;
+            pq.push(n);
         }
     }
 
     //build tree
-    while (pq.size())   //enquanto a fila não estiver vazia
+    while (pq.size() > 1)   //enquanto a fila não estiver vazia
     {
-        node z(0,0);    //mudar
-        tuple <unsigned, char> temp = pq.top();
-        pq.pop();
-        cout << get<0>(temp) << " ," << get<1>(temp) << "popped\n";
+        node* z = (node*) malloc(sizeof(node));
+        z->character = 0;
+        z->left = pq.top(); pq.pop();
+        z->right = pq.top(); pq.pop();
+        z->frequency = z->left->frequency + z->right->frequency;
+        //cout << pq.top()->frequency << " ," << pq.top()->character << " popped\n";
+        pq.push(z);
     }    
     
-    //return node();
+    return pq.top();
 }
 
 
@@ -92,22 +96,14 @@ int main() {
         }
         fclose(input_f);
         
+        node* tree = buildHuffmanTree(bytes);
+        cout << tree->left->frequency << endl;
 
-/*      
-        for(int i =0; i<256; i++)
-        {
-            if(bytes[i] != 0)
-            {
-                cout << i << endl;
-            }
-        }
-*/        
-        buildHuffmanTree(bytes);
-        //node tree = buildHuffmanTree(wf);
         FILE* output_f = fopen("test_out.txt", "wb");
         fwrite(&c, 1, sizeof(c), output_f);
     }
     
+    cout << "end\n";
     //std::ofstream output;
     return 0;
 }
