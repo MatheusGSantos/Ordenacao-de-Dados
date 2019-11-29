@@ -4,16 +4,18 @@
 #include <fstream>
 #include <tuple>
 #include <vector>
+#include <string>
 
 /* C Libraries */
 #include <stdio.h>
 #include <stdlib.h>
-#include <locale.h>
+
 
 using namespace std;
-//typedef unsigned char byte;
 
-//tree node
+
+
+// tree node
 class node{
     public:
         unsigned frequency;
@@ -25,12 +27,15 @@ class node{
         ~node(){}
 };
 
+
+// classe para comparar os nós na priority queue
 class compare{
     public:
         bool operator()(const node* n1, const node* n2) const{
             return n1->frequency > n2->frequency;
         }
 };
+
 
 //writing a character into a file
 void write_byte(ofstream file, char c)
@@ -43,9 +48,7 @@ void write_byte(ofstream file, char c)
 
 node* buildHuffmanTree(unsigned bytes[256])
 {
-    // priority queue < frequencia, identificador > //mudar
-    priority_queue<node*, vector< node* >, compare> pq;
-
+    priority_queue<node*, vector< node* >, compare> pq; // fila de prioridade
     // dando enqueue
     for(int i=0; i < 256; i++)
     {
@@ -59,9 +62,10 @@ node* buildHuffmanTree(unsigned bytes[256])
             pq.push(n);
         }
     }
+    int n = pq.size();
 
     //build tree
-    while (pq.size() > 1)   //enquanto a fila não estiver vazia
+    for(int i = 0; i < (n-1); i++)   // tamanho de nós menos 1 vezes
     {
         node* z = (node*) malloc(sizeof(node));
         z->character = 0;
@@ -70,34 +74,62 @@ node* buildHuffmanTree(unsigned bytes[256])
         z->frequency = z->left->frequency + z->right->frequency;
         //cout << pq.top()->frequency << " ," << pq.top()->character << " popped\n";
         pq.push(z);
-    }    
+    }
     
     return pq.top();
 }
 
 
+void getCodes(node* n, string (&c)[256], string buf)
+{
+    if( !(n->left) && !(n->right) )
+    {
+        c[n->character] = buf;
+    }
+    else
+    {
+        getCodes(n->left, c, buf+'0');
+        getCodes(n->right, c, buf+'1');
+    }
+}
 
 
 int main() {
     int operation = 0;
-    //setlocale(LC_ALL,"");
+
     if(operation == 0) //compression
     {
-        FILE* input_f = fopen("test.bin", "rb");
-        //get every byte frequency
-        //byte c;
+        ifstream file("test.bin", ios::in | ios::binary);
+
+        /* get every byte frequency */
         unsigned bytes[256] = {0};
         char c;
-
-        while( fread(&c, sizeof(char), 1, input_f) == 1)
+        do
         {
-            //printf("character: %c\n", c);
+            c = file.get();
             bytes[c]+= 1;
+        } while( !file.eof() );
+        file.close();
+        /*
+        for(int i = 0; i < 256; i++)
+        {
+            if(bytes[i] > 0)
+                cout << i << " : " << bytes[i] << endl;
         }
-        fclose(input_f);
-        
+        */
         node* tree = buildHuffmanTree(bytes);
-        cout << tree->left->frequency << endl;
+        string codes[256];
+        string buffer = "";
+        getCodes(tree, codes, buffer);
+        for(int i = 0; i < 256; i++)
+        {
+            if(codes[i] !=  "")
+                cout << codes[i] << endl;
+        }
+
+
+
+        //cout << tree->left->frequency << endl;
 
         FILE* output_f = fopen("test_out.txt", "wb");
         fwrite(&c, 1, sizeof(c), output_f);
