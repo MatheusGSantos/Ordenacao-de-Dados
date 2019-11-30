@@ -2,7 +2,6 @@
 #include <iostream>
 #include <queue>
 #include <fstream>
-#include <tuple>
 #include <vector>
 #include <string>
 
@@ -12,7 +11,6 @@
 
 
 using namespace std;
-
 
 
 // tree node
@@ -28,7 +26,6 @@ class node{
 };
 
 
-// classe para comparar os nós na priority queue
 class compare{
     public:
         bool operator()(const node* n1, const node* n2) const{
@@ -37,19 +34,13 @@ class compare{
 };
 
 
-//writing a character into a file
-void write_byte(ofstream file, char c)
-{
-    file.put(c);
-}
-
-
 /* Compression */
 
+// builds the huffman tree
 node* buildHuffmanTree(unsigned bytes[256])
 {
-    priority_queue<node*, vector< node* >, compare> pq; // fila de prioridade
-    // dando enqueue
+    priority_queue<node*, vector< node* >, compare> pq; // priority queue
+    // enqueue
     for(int i=0; i < 256; i++)
     {
         if(bytes[i] != 0)
@@ -59,20 +50,21 @@ node* buildHuffmanTree(unsigned bytes[256])
             n->character = i;
             n->left = NULL;
             n->right = NULL;
+            //cout << "enqueueing: " << i << endl;
             pq.push(n);
         }
     }
     int n = pq.size();
 
     //build tree
-    for(int i = 0; i < (n-1); i++)   // tamanho de nós menos 1 vezes
+    for(int i = 0; i < (n-1); i++)   // n_nodes - 1
     {
         node* z = (node*) malloc(sizeof(node));
         z->character = 0;
         z->left = pq.top(); pq.pop();
         z->right = pq.top(); pq.pop();
         z->frequency = z->left->frequency + z->right->frequency;
-        //cout << pq.top()->frequency << " ," << pq.top()->character << " popped\n";
+        //cout << z->frequency << " : " << z->character << ", left: { " << z->left->character << " : " << z->left->frequency << "}, right: { " << z->right->character<< " : " << z->right->frequency << "}"<< endl;
         pq.push(z);
     }
     
@@ -80,6 +72,21 @@ node* buildHuffmanTree(unsigned bytes[256])
 }
 
 
+// prints the tree
+void printTree(node* tree)
+{
+    if (!tree)
+    {
+        return;
+    }
+    
+    cout << tree->character << " : " << tree->frequency << endl;
+    printTree(tree->left);
+    printTree(tree->right);
+}
+
+
+// gets the huffman code for every byte
 void getCodes(node* n, string (&c)[256], string buf)
 {
     if( !(n->left) && !(n->right) )
@@ -94,48 +101,86 @@ void getCodes(node* n, string (&c)[256], string buf)
 }
 
 
+// returns the byte equivalent to the byte sequence (bit manipulation)
+char getByte(char buf[8])
+{
+    char byte = 0;
+    for(int i = 0; i < 8; i++)
+    {
+        if (buf[7-i] == '1')
+        {
+            byte = (byte | (1 << i) );
+        }
+    }
+    return byte;
+}
+
+
 int main() {
     int operation = 0;
 
-    if(operation == 0) //compression
+    if(operation == 0) // compression
     {
-        ifstream file("test.bin", ios::in | ios::binary);
+        ifstream in("teste.bin", ios::in | ios::binary);
 
         /* get every byte frequency */
         unsigned bytes[256] = {0};
         char c;
-        do
+        while( in.get(c) )
         {
-            c = file.get();
             bytes[c]+= 1;
-        } while( !file.eof() );
-        file.close();
-        /*
-        for(int i = 0; i < 256; i++)
-        {
-            if(bytes[i] > 0)
-                cout << i << " : " << bytes[i] << endl;
         }
-        */
+        
+        /* build the huffman tree */
         node* tree = buildHuffmanTree(bytes);
+        //printTree(tree);
+
+        /* get huffman code for every byte */
         string codes[256];
         string buffer = "";
         getCodes(tree, codes, buffer);
-        for(int i = 0; i < 256; i++)
+
+        /* parse the file and write the compressed bytes into output */
+        in.clear(); // rewind
+        in.seekg(0); // the file pointer
+        ofstream out("teste_c.bin", ios::out | ios::binary);
+        char byte_buffer[8];
+        int buf_index = 0;
+        while (in.get(c))
         {
-            if(codes[i] !=  "")
-                cout << codes[i] << endl;
+            int code_size = codes[c].size(); // huffman code size of the byte read
+            for(int i = 0; i < code_size; i++)
+            {
+                byte_buffer[buf_index++] = codes[c][i]; 
+                if(buf_index == 8)
+                {
+                    buf_index = 0;
+                    // write byte
+                    char w_byte = getByte(byte_buffer);
+                    out.write(&w_byte,1);
+                }
+            }
         }
+        // completing the last byte
+        while ( buf_index < 8 )
+            byte_buffer[buf_index++] = '0';
+        if(buf_index == 8)
+        {
+            buf_index = 0;
+            // write byte
+            char w_byte = getByte(byte_buffer);
+            out.write(&w_byte,1);
+        }
+        in.close();
+        out.close();
 
-
-
-        //cout << tree->left->frequency << endl;
-
-        FILE* output_f = fopen("test_out.txt", "wb");
-        fwrite(&c, 1, sizeof(c), output_f);
+        cout << "Finished compression.\n";
+    }
+    else    // decompression
+    {
+        /* code */
     }
     
-    cout << "end\n";
-    //std::ofstream output;
+    
     return 0;
 }
