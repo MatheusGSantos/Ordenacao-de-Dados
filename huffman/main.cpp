@@ -133,7 +133,6 @@ int main() {
         
         /* build the huffman tree */
         node* tree = buildHuffmanTree(bytes);
-        //printTree(tree);
 
         /* get huffman code for every byte */
         string codes[256];
@@ -144,6 +143,12 @@ int main() {
         in.clear(); // rewind
         in.seekg(0); // the file pointer
         ofstream out("teste_c.bin", ios::out | ios::binary);
+
+        // write byte frequency array into output file
+        for(int i = 0; i < 256; i++)
+        {
+            out << bytes[i];
+        }
         char byte_buffer[8];
         int buf_index = 0;
         while (in.get(c))
@@ -178,7 +183,19 @@ int main() {
     }
     else    // decompression
     {
-        /* code */
+        ifstream in("teste_c.bin", ios::in | ios::binary);
+        
+        /* get every byte frequency */
+        unsigned bytes[256] = {0};
+        char c;
+        for(int i = 0; i < 256; i++)
+        {
+            in.get(c);
+            bytes[i] = (unsigned) atoi(&c);
+        }
+        /* build the huffman tree */
+        node* tree = buildHuffmanTree(bytes);
+        
     }
     
     
