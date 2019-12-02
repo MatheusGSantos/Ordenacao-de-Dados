@@ -144,7 +144,7 @@ int main() {
         in.seekg(0); // the file pointer
         ofstream out("teste_c.bin", ios::out | ios::binary);
 
-        // write byte frequency array into output file
+        /* write byte frequency array into output file */
         for(int i = 0; i < 256; i++)
         {
             out << bytes[i];
@@ -166,7 +166,7 @@ int main() {
                 }
             }
         }
-        // completing the last byte
+        /* completing the last byte */
         while ( buf_index < 8 )
             byte_buffer[buf_index++] = '0';
         if(buf_index == 8)
