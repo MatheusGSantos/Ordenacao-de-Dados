@@ -34,8 +34,6 @@ class compare{
 };
 
 
-/* Compression */
-
 // builds the huffman tree
 node* buildHuffmanTree(unsigned bytes[256])
 {
@@ -70,20 +68,6 @@ node* buildHuffmanTree(unsigned bytes[256])
 }
 
 
-// prints the tree
-void printTree(node* tree)
-{
-    if (!tree)
-    {
-        return;
-    }
-    
-    cout << tree->character << " : " << tree->frequency << endl;
-    printTree(tree->left);
-    printTree(tree->right);
-}
-
-
 // gets the huffman code for every byte
 void getCodes(node* n, string (&c)[256], string buf)
 {
@@ -114,8 +98,20 @@ unsigned char getByte(unsigned char buf[8])
 }
 
 
+// returns the accumulative sum of frequencies
+unsigned int getMaxNFreq(unsigned b[256])
+{
+    unsigned long int f_sum = 0;     
+    for(int i = 0; i < 256; i++)
+    {
+        f_sum+=b[i];
+    }
+    return f_sum;
+}
+
+
 int main() {
-    int operation = 0;
+    int operation = 1;
     if(operation == 0) // compression
     {
         ifstream in("teste.bin", ios::in | ios::binary);
@@ -142,7 +138,7 @@ int main() {
 
         /* write byte frequency array into output file */
         FILE* fp_out = fopen("teste_c.bin", "wb");
-        fwrite(&bytes, sizeof(bytes), 1, fp_out);
+        for(int i = 0; i < 256; i++) fwrite(&bytes[i], sizeof(unsigned), 1, fp_out);
 
         /* start compression */
         unsigned char byte_buffer[8];
@@ -185,7 +181,7 @@ int main() {
 
         /* get every byte frequency */
         unsigned bytes[256] = {0};
-        fread(&bytes, sizeof(bytes), 1, fp);
+        for(int i = 0; i < 256; i++) fread(&bytes[i], sizeof(unsigned), 1, fp);
         int code_start = ftell(fp);
         fclose(fp);
 
@@ -200,6 +196,8 @@ int main() {
         unsigned char r_byte;
         FILE* out = fopen("teste_d.bin", "wb");
         
+        const unsigned long max_n_bytes = getMaxNFreq(bytes);
+        unsigned long counted = 0;
         while(in.peek() != EOF)
         {
             r_byte = in.get();
@@ -210,51 +208,26 @@ int main() {
             {
                 if(!(aux->left) && !(aux->right))
                 {
-                    aux = tree;
                     fwrite(&(aux->character), sizeof(aux->character), 1, out);
-                    cout << aux->character << " in the file\n";
+                    aux = tree;
+                    counted++;
+                    if(counted == max_n_bytes) break;
+                    
                 }
                 if( r_byte & (comparator >> i) ) // bit = 1, direita
                 {
-                    cout << "its a 1\n";
                     aux = aux->right;
                 }
                 else    // bit = 0, esquerda
                 {
-                    cout << "its a 0\n";
                     aux = aux->left;
                 }
             }
         }
         in.close();
         fclose(out);
-        
+        cout << "Finished decompression.\n";
     }
-    
-    
+
     return 0;
 }
-
-// MUDAR TODOS OS CHAR PARA UNSIGNED CHAR
-
-/*
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
-
-using namespace std;
-
-int main() {
-    ofstream out("test_out.bin", ios::out | ios::binary);
-    unsigned char c = 129;
-    unsigned int arr[256] = {0};
-    arr[c]++;
-    out << c;
-    out.close();
-    FILE* fp = fopen("test_out.bin", "rb");
-    unsigned char b;
-    fscanf(fp, "%c", &b);
-    arr[b]++;
-    cout << arr[b] << endl;
-}
-*/
