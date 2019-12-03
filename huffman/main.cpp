@@ -126,9 +126,7 @@ int main() {
         while( in.peek() != EOF ){
             c = in.get();
             bytes[c]+= 1;
-            //cout << c << " : " << bytes[c] << endl;
         }
-        
         
         /* build the huffman tree */
         node* tree = buildHuffmanTree(bytes);
@@ -145,22 +143,18 @@ int main() {
         /* write byte frequency array into output file */
         FILE* fp_out = fopen("teste_c.bin", "wb");
         fwrite(&bytes, sizeof(bytes), 1, fp_out);
-        //fclose(fp_out);
 
         /* start compression */
-        //ofstream out("teste_c.bin", ios::app | ios::binary);
         unsigned char byte_buffer[8];
         int buf_index = 0;
         
         while ( in.peek() != EOF )
         {
             c = in.get();
-            //cout << c << " read from file\n";
             int code_size = codes[c].size(); // huffman code size of the byte read
             for(int i = 0; i < code_size; i++)
             {
                 byte_buffer[buf_index++] = codes[c][i];
-                cout << codes[c][i] << " bit evaluated\n";
                 if(buf_index == 8)
                 {
                     buf_index = 0;
@@ -182,7 +176,6 @@ int main() {
         }
         in.close();
         fclose(fp_out);
-        //out.close();
 
         cout << "Finished compression.\n";
     }
@@ -205,7 +198,7 @@ int main() {
 
         /* start decompression */
         unsigned char r_byte;
-        ofstream out("teste_d.bin", ios::out | ios::binary);
+        FILE* out = fopen("teste_d.bin", "wb");
         
         while(in.peek() != EOF)
         {
@@ -218,21 +211,23 @@ int main() {
                 if(!(aux->left) && !(aux->right))
                 {
                     aux = tree;
-                    out.put(aux->character);
+                    fwrite(&(aux->character), sizeof(aux->character), 1, out);
                     cout << aux->character << " in the file\n";
                 }
-                if(r_byte & (comparator >> i) ) // bit = 1, direita
+                if( r_byte & (comparator >> i) ) // bit = 1, direita
                 {
+                    cout << "its a 1\n";
                     aux = aux->right;
                 }
-                else    //bit = 0
+                else    // bit = 0, esquerda
                 {
+                    cout << "its a 0\n";
                     aux = aux->left;
                 }
             }
         }
         in.close();
-        out.close();
+        fclose(out);
         
     }
     
