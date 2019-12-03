@@ -142,13 +142,14 @@ int main() {
         /* parse the file and write the compressed bytes into output */
         in.clear(); // rewind
         in.seekg(0); // the file pointer
-        ofstream out("teste_c.bin", ios::out | ios::binary);
 
         /* write byte frequency array into output file */
-        for(int i = 0; i < 256; i++)
-        {
-            out << bytes[i];
-        }
+        FILE* fp_out = fopen("teste_c.bin", "wb");
+        fwrite(&bytes, sizeof(bytes), 1, fp_out);
+        fclose(fp_out);
+
+        /* start compression */
+        ofstream out("teste_c.bin", ios::app | ios::binary);
         char byte_buffer[8];
         int buf_index = 0;
         while (in.get(c))
@@ -183,21 +184,57 @@ int main() {
     }
     else    // decompression
     {
-        ifstream in("teste_c.bin", ios::in | ios::binary);
-        
+        FILE* fp = fopen("teste_c.bin", "rb");
+
         /* get every byte frequency */
         unsigned bytes[256] = {0};
-        char c;
-        for(int i = 0; i < 256; i++)
-        {
-            in.get(c);
-            bytes[i] = (unsigned) atoi(&c);
-        }
+        fread(&bytes, sizeof(bytes), 1, fp);
+        int code_start = ftell(fp);
+        fclose(fp);
+
+        /* continue reading file */
+        ifstream in("teste_c.bin", ios::in | ios::binary);
+        in.seekg(code_start);
+
         /* build the huffman tree */
         node* tree = buildHuffmanTree(bytes);
-        
+
+        /* start decompression */
+        char byte;
+        while(in.get(byte))
+        {
+            char direction = 128;
+            for(int i = 0; i < 8; i++)
+            {
+
+            }
+        }
     }
     
     
     return 0;
 }
+
+// MUDAR TODOS OS CHAR PARA UNSIGNED CHAR
+
+/*
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+
+using namespace std;
+
+int main() {
+    ofstream out("test_out.bin", ios::out | ios::binary);
+    unsigned char c = 129;
+    unsigned int arr[256] = {0};
+    arr[c]++;
+    out << c;
+    out.close();
+    FILE* fp = fopen("test_out.bin", "rb");
+    unsigned char b;
+    fscanf(fp, "%c", &b);
+    arr[b]++;
+    cout << arr[b] << endl;
+}
+*/
