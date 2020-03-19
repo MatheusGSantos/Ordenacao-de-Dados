@@ -6,9 +6,7 @@
 
 using namespace std;
 
-void InsertCase1(struct Node* n);
-void InsertRepair(struct Node* n);
-
+//ok
 struct Node{
     char color; //r ou b
     int value;
@@ -18,7 +16,7 @@ struct Node{
 };
 
 
-void setColor(struct Node* n, char color)
+void setColor(struct Node* n, char color) //ok
 {
     if(n == NULL)
         return;
@@ -27,16 +25,16 @@ void setColor(struct Node* n, char color)
 }
 
 
-void SwapColor(struct Node* a, struct Node* b)
+void SwapColor(struct Node* a, struct Node* b) //ok
 {
     char aux = a->color;
     setColor(a, b->color);
     setColor(b, aux);
 }
 
-struct Node* new_node(int v)
+struct Node* new_node(int v) //ok
 {
-    struct Node* n = (struct Node*) malloc(sizeof(struct Node));
+    struct Node* n = new struct Node;
     n->parent = NULL;
     n->left = NULL;
     n->right = NULL;
@@ -46,26 +44,28 @@ struct Node* new_node(int v)
 }
 
 
-struct Node* GetParent(struct Node* n) {
+struct Node* GetParent(struct Node* n) //ok
+{
     return n == NULL ? NULL : n->parent; //NULL para raiz e vazia, pai para os demais
 }
 
 
-struct Node* GetGrandParent(struct Node* n) {
+struct Node* GetGrandParent(struct Node* n) //ok
+{
     return GetParent(GetParent(n)); //retorna avô do nó
 }
 
 
-void treeInsert(struct Node** n, struct Node* n_node)
+void treeInsert(struct Node *&n, struct Node* n_node) //ok
 {
-    if(!(*n))
+    if(!n)
     {
-        *n = n_node; //settando a raiz da árvore
+        n = n_node; //settando a raiz da árvore
         cout << "Root is " << n_node->value << endl;
     }
     else
     {
-        struct Node* aux = *n;
+        struct Node* aux = n;
         while(1)
         {
             if( n_node->value > aux->value ) //caso valor seja maior que o valor do nó atual, vá para a direita
@@ -104,7 +104,7 @@ void treeInsert(struct Node** n, struct Node* n_node)
 }
 
 
-void RotateLeft(struct Node* root, struct Node* n)
+void RotateLeft(struct Node *&root, struct Node *&n)
 {
     struct Node *right_child = n->right;
     n->right = right_child->left;
@@ -126,7 +126,7 @@ void RotateLeft(struct Node* root, struct Node* n)
 }
 
 
-void RotateRight(struct Node* root, struct Node* n) //igual ao RotateLeft, mas trocando os left por right
+void RotateRight(struct Node *&root, struct Node *&n) //igual ao RotateLeft, mas trocando os left por right
 {
     struct Node *left_child = n->left;
     n->left = left_child->right;
@@ -148,7 +148,7 @@ void RotateRight(struct Node* root, struct Node* n) //igual ao RotateLeft, mas t
 }
 
 
-void InsertRepair(struct Node* root, struct Node* n)
+void InsertRepair(struct Node *&root, struct Node *&n)
 {
     struct Node *parent = NULL;
     struct Node *grandparent = NULL;
@@ -196,11 +196,11 @@ void InsertRepair(struct Node* root, struct Node* n)
 }
 
 
-void RBTree_Insert(struct Node** n, struct Node* n_node)
+void RBTree_Insert(struct Node *&n, struct Node *&n_node)
 {
     cout << "Insertion Process Start\n";
     treeInsert(n, n_node);
-    InsertRepair(*n, n_node);
+    InsertRepair(n, n_node);
     cout << "Node color: "<< n_node->color << endl;
 }
 
@@ -217,7 +217,8 @@ int main() {
     struct Node *root = NULL;
     for(int i = 0; i<MAX; i++)
     {
-        RBTree_Insert(&root, new_node(rand_ar[i]) );
+        struct Node* n = new_node(rand_ar[i]);
+        RBTree_Insert(root, n);
     }
 
     return 0;
